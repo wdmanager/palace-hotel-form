@@ -1004,6 +1004,14 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
         </div>
 
         <div class="form-group">
+          <label class="form-label" for="customerEmail">
+            メールアドレス <span class="required-mark">*</span>
+          </label>
+          <input class="form-input" type="email" id="customerEmail" name="customer_email" placeholder="例）example@email.com" required>
+          <p class="field-hint">お申し込み確認メールをお送りします。</p>
+        </div>
+
+        <div class="form-group">
           <label class="form-label" for="customerPhone">
             電話番号 <span class="required-mark">*</span>
           </label>
@@ -1080,6 +1088,10 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
             <span class="order-summary-row-value" id="summaryWeddingDate">（未入力）</span>
           </div>
           <div class="order-summary-row">
+            <span class="order-summary-row-label">メールアドレス</span>
+            <span class="order-summary-row-value" id="summaryEmail">（未入力）</span>
+          </div>
+          <div class="order-summary-row">
             <span class="order-summary-row-label">電話番号</span>
             <span class="order-summary-row-value" id="summaryPhone">（未入力）</span>
           </div>
@@ -1104,9 +1116,9 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
         <div class="notice-box">
           <span class="notice-box-title">Notes</span>
           <ul class="notice-list">
-            <li>ご指名のフォトグラファーが担当できない場合は、別の担当者よりご連絡する場合がございます</li>
+            <li>ご指名のフォトグラファーのご対応が難しい場合のみ、担当者よりご連絡いたします</li>
             <li>ご契約内容やお申し込み時期により、料金が異なる場合があります</li>
-            <li>お申し込み内容を確認後、担当者よりご連絡させていただく場合がございます</li>
+            <li>お申し込み後、確認メールをご入力のメールアドレスにお送りします</li>
           </ul>
         </div>
 
@@ -1125,7 +1137,10 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
           </div>
           <h2 class="success-title">お申し込みを受け付けました</h2>
           <p class="success-body">
-            ご入力いただいた内容を確認のうえ、担当者よりご連絡いたします。<br><br>
+            ご入力いただいたメールアドレスに確認メールをお送りしました。<br><br>
+            ご指名のフォトグラファーのご対応が難しい場合にのみ、<br>
+            担当者よりご連絡いたします。<br>
+            その他の場合、こちらからのご連絡はございません。<br><br>
             ご不明な点は
             <a href="mailto:contact@kuppography.com" style="color:var(--text-secondary)">contact@kuppography.com</a><br>
             までお気軽にお問い合わせください。
@@ -1340,6 +1355,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
     var fields = [
       ['names',         'summaryNames'],
       ['weddingDate',   'summaryWeddingDate'],
+      ['customerEmail', 'summaryEmail'],
       ['customerPhone', 'summaryPhone'],
       ['recipientName', 'summaryRecipient'],
       ['postalCode',    'summaryPostal'],
@@ -1354,7 +1370,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
     });
   }
 
-  ['names','weddingDate','customerPhone','recipientName','postalCode','address','note'].forEach(function (id) {
+  ['names','weddingDate','customerEmail','customerPhone','recipientName','postalCode','address','note'].forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('input',  updateSummary);
@@ -1461,6 +1477,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
       photographer:   photographerInput.value,
       names:          namesVal,
       wedding_date:   document.getElementById('weddingDate').value,
+      customer_email: document.getElementById('customerEmail').value.trim(),
       customer_phone: document.getElementById('customerPhone').value.trim(),
       recipient_name: document.getElementById('recipientName').value.trim(),
       postal_code:    document.getElementById('postalCode').value.trim(),
@@ -1470,6 +1487,14 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
       _subject:       '【アルバム申込】Palace Hotel Tokyo ' + namesVal,
       _template:      'table',
       _captcha:       'false',
+      _replyto:       document.getElementById('customerEmail').value.trim(),
+      _autoresponse:  'この度はkuppographyのアルバムをお申し込みいただき、誠にありがとうございます。\n\n以下の内容でお申し込みを承りました。\n\n' +
+                      '■ アルバムタイプ：' + albumInput.value + '\n' +
+                      '■ お名前：' + namesVal + '\n' +
+                      '■ 挙式日：' + document.getElementById('weddingDate').value + '\n' +
+                      '■ お届け先：〒' + document.getElementById('postalCode').value.trim() + ' ' + document.getElementById('address').value.trim() + '\n\n' +
+                      'ご指名のフォトグラファーのご対応が難しい場合にのみ、担当者よりご連絡いたします。\nその他の場合、こちらからのご連絡はございません。\n\n' +
+                      'ご不明な点がございましたら、お気軽にお問い合わせください。\ncontact@kuppography.com\n\nkuppography',
     };
 
     try {
