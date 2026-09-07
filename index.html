@@ -788,7 +788,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
                 <span class="option-card-content">
                   <span class="option-card-title">スクエアミニ</span>
                   <span class="option-card-desc">186mm × 186mm（透明ケース付き）</span>
-                  <span class="option-card-price">¥42,000<span class="price-tax">（¥46,200 税込）</span></span>
+                  <span class="option-card-price">¥42,000 / 冊<span class="price-tax">（¥46,200 税込）</span></span>
                 </span>
               </div>
               <div class="option-card" id="cardMiniWide" role="radio" aria-checked="false" tabindex="0">
@@ -797,7 +797,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
                 <span class="option-card-content">
                   <span class="option-card-title">ワイドミニ</span>
                   <span class="option-card-desc">152mm × 218mm（ケースなし）</span>
-                  <span class="option-card-price">¥40,000<span class="price-tax">（¥44,000 税込）</span></span>
+                  <span class="option-card-price">¥40,000 / 冊<span class="price-tax">（¥44,000 税込）</span></span>
                 </span>
               </div>
             </div>
@@ -842,7 +842,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
                 <span class="option-card-indicator"></span>
                 <span class="option-card-content">
                   <span class="option-card-title">スクエア増刷</span>
-                  <span class="option-card-price">¥84,000<span class="price-tax">（¥92,400 税込）</span></span>
+                  <span class="option-card-price">¥84,000 / 冊<span class="price-tax">（¥92,400 税込）</span></span>
                 </span>
               </div>
               <div class="option-card" id="cardReprintWide" role="radio" aria-checked="false" tabindex="0">
@@ -850,7 +850,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
                 <span class="option-card-indicator"></span>
                 <span class="option-card-content">
                   <span class="option-card-title">ワイド増刷</span>
-                  <span class="option-card-price">¥75,000<span class="price-tax">（¥82,500 税込）</span></span>
+                  <span class="option-card-price">¥75,000 / 冊<span class="price-tax">（¥82,500 税込）</span></span>
                 </span>
               </div>
             </div>
@@ -1039,6 +1039,21 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
         </div>
 
         <div class="form-group">
+          <label class="form-label">アルバム記載ローマ字 <span class="required-mark">*</span></label>
+          <p class="field-hint" style="margin-bottom:8px;">頭文字のみ大文字に自動変換されます。例）Taro &amp; Hanako</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label class="form-label" for="romanGroom" style="font-size:11px;margin-bottom:4px;">新郎</label>
+              <input class="form-input" type="text" id="romanGroom" name="roman_groom" placeholder="例）Taro" required>
+            </div>
+            <div>
+              <label class="form-label" for="romanBride" style="font-size:11px;margin-bottom:4px;">新婦</label>
+              <input class="form-input" type="text" id="romanBride" name="roman_bride" placeholder="例）Hanako" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
           <label class="form-label" for="customerEmail">
             メールアドレス <span class="required-mark">*</span>
           </label>
@@ -1121,6 +1136,10 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
           <div class="order-summary-row">
             <span class="order-summary-row-label">挙式日</span>
             <span class="order-summary-row-value" id="summaryWeddingDate">（未入力）</span>
+          </div>
+          <div class="order-summary-row">
+            <span class="order-summary-row-label">アルバム記載ローマ字</span>
+            <span class="order-summary-row-value" id="summaryRoman">（未入力）</span>
           </div>
           <div class="order-summary-row">
             <span class="order-summary-row-label">メールアドレス</span>
@@ -1385,6 +1404,13 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
     var sPhoto = document.getElementById('summaryPhotographer');
     if (sPhoto) sPhoto.textContent = pInput ? pInput.value : '（未選択）';
 
+    var sRoman = document.getElementById('summaryRoman');
+    if (sRoman) {
+      var g = document.getElementById('romanGroom').value.trim();
+      var b = document.getElementById('romanBride').value.trim();
+      sRoman.textContent = (g || b) ? (g || '—') + ' & ' + (b || '—') : '（未入力）';
+    }
+
     var fields = [
       ['names',         'summaryNames'],
       ['weddingDate',   'summaryWeddingDate'],
@@ -1403,7 +1429,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
     });
   }
 
-  ['names','weddingDate','customerEmail','customerPhone','recipientName','postalCode','address','note'].forEach(function (id) {
+  ['names','weddingDate','romanGroom','romanBride','customerEmail','customerPhone','recipientName','postalCode','address','note'].forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('input',  updateSummary);
@@ -1446,6 +1472,19 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
   });
   postalInput.addEventListener('blur', function () {
     if (postalInput.value.replace(/-/g, '').length === 7) lookupZip(postalInput.value);
+  });
+
+  // ── ローマ字 タイトルケース自動変換 ──────────────────────────────────────
+  function toTitleCase(str) {
+    return str.replace(/\b[a-zA-Z]/g, function(c) { return c.toUpperCase(); });
+  }
+  ['romanGroom', 'romanBride'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('blur', function() {
+      el.value = toTitleCase(el.value);
+      updateSummary();
+    });
   });
 
   var wdInput = document.getElementById('weddingDate');
@@ -1503,23 +1542,24 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
     var namesVal    = document.getElementById('names').value.trim();
 
     var payload = {
-      venue:          'Palace Hotel Tokyo',
-      album_type:     albumInput.value,
-      mini_album:     mini.chk.checked    ? '希望する（' + miniType    + '　' + miniQty    + '冊）' : '不要',
-      reprint:        reprint.chk.checked ? '希望する（' + reprintType + '　' + reprintQty + '冊）' : '不要',
-      photographer:   photographerInput.value,
-      names:          namesVal,
-      wedding_date:   document.getElementById('weddingDate').value,
-      customer_email: document.getElementById('customerEmail').value.trim(),
-      customer_phone: document.getElementById('customerPhone').value.trim(),
-      recipient_name: document.getElementById('recipientName').value.trim(),
-      postal_code:    document.getElementById('postalCode').value.trim(),
-      address:        document.getElementById('address').value.trim(),
-      note:           document.getElementById('note').value.trim(),
-      submitted_at:   new Date().toISOString(),
-      _subject:       '【アルバム申込】Palace Hotel Tokyo ' + namesVal,
-      _template:      'table',
-      _captcha:       'false',
+      '会場':               'Palace Hotel Tokyo',
+      'アルバムタイプ':     albumInput.value,
+      'ミニアルバム':       mini.chk.checked    ? '希望する（' + miniType    + '　' + miniQty    + '冊）' : '不要',
+      '増刷':               reprint.chk.checked ? '希望する（' + reprintType + '　' + reprintQty + '冊）' : '不要',
+      'フォトグラファー':   photographerInput.value,
+      'おふたりのお名前':   namesVal,
+      '挙式日':             document.getElementById('weddingDate').value,
+      'アルバム記載ローマ字': document.getElementById('romanGroom').value.trim() + ' & ' + document.getElementById('romanBride').value.trim(),
+      'メールアドレス':     document.getElementById('customerEmail').value.trim(),
+      '電話番号':           document.getElementById('customerPhone').value.trim(),
+      'お届け先氏名':       document.getElementById('recipientName').value.trim(),
+      '郵便番号':           document.getElementById('postalCode').value.trim(),
+      'お届け先住所':       document.getElementById('address').value.trim(),
+      '備考':               document.getElementById('note').value.trim(),
+      '受付日時':           new Date().toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'}),
+      _subject:             '【アルバムお申し込み】' + namesVal + ' 様',
+      _template:            'table',
+      _captcha:             'false',
     };
 
     try {
