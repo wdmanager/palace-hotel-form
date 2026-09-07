@@ -1116,7 +1116,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
         <div class="notice-box">
           <span class="notice-box-title">Notes</span>
           <ul class="notice-list">
-            <li>ご指名のフォトグラファーのご対応が難しい場合のみ、担当者よりご連絡いたします</li>
+            <li>ご対応が難しい内容の場合には、担当者よりご連絡させていただきます</li>
             <li>ご契約内容やお申し込み時期により、料金が異なる場合があります</li>
             <li>お申し込み後、確認メールをご入力のメールアドレスにお送りします</li>
           </ul>
@@ -1138,9 +1138,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
           <h2 class="success-title">お申し込みを受け付けました</h2>
           <p class="success-body">
             ご入力いただいたメールアドレスに確認メールをお送りしました。<br><br>
-            ご指名のフォトグラファーのご対応が難しい場合にのみ、<br>
-            担当者よりご連絡いたします。<br>
-            その他の場合、こちらからのご連絡はございません。<br><br>
+            ご対応が難しい内容の場合には、担当者よりご連絡させていただきます。<br><br>
             ご不明な点は
             <a href="mailto:contact@kuppography.com" style="color:var(--text-secondary)">contact@kuppography.com</a><br>
             までお気軽にお問い合わせください。
@@ -1488,13 +1486,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
       _template:      'table',
       _captcha:       'false',
       _replyto:       document.getElementById('customerEmail').value.trim(),
-      _autoresponse:  'この度はkuppographyのアルバムをお申し込みいただき、誠にありがとうございます。\n\n以下の内容でお申し込みを承りました。\n\n' +
-                      '■ アルバムタイプ：' + albumInput.value + '\n' +
-                      '■ お名前：' + namesVal + '\n' +
-                      '■ 挙式日：' + document.getElementById('weddingDate').value + '\n' +
-                      '■ お届け先：〒' + document.getElementById('postalCode').value.trim() + ' ' + document.getElementById('address').value.trim() + '\n\n' +
-                      'ご指名のフォトグラファーのご対応が難しい場合にのみ、担当者よりご連絡いたします。\nその他の場合、こちらからのご連絡はございません。\n\n' +
-                      'ご不明な点がございましたら、お気軽にお問い合わせください。\ncontact@kuppography.com\n\nkuppography',
+      _autoresponse:  'この度はkuppographyのアルバムをお申し込みいただき、誠にありがとうございます。お申し込みを承りました。ご対応が難しい内容の場合には、担当者よりご連絡させていただきます。ご不明な点は contact@kuppography.com までお気軽にお問い合わせください。kuppography',
     };
 
     try {
