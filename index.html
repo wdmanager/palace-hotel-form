@@ -1148,6 +1148,7 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
   'use strict';
 
   var ENDPOINT = 'https://formsubmit.co/ajax/contact@kuppography.com';
+  var GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxRxQ6uT8uxTfKNpPxgVF3VIle6zxKczDMKsaWVMn31FfE__yiwJc50kbnrzH4hwfIb/exec';
 
   var form         = document.getElementById('applyForm');
   var submitBtn    = document.getElementById('submitBtn');
@@ -1486,6 +1487,16 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
         formError.classList.add('visible');
         return;
       }
+
+      // Googleスプレッドシートにも送信（fire & forget）
+      try {
+        fetch(GAS_ENDPOINT, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch(e) { /* ignore */ }
 
       setLoading(false);
       showSuccess();
