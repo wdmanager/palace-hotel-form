@@ -429,6 +429,23 @@ input[type="date"] { cursor: pointer; }
   font-size: 10.5px; margin-top: 2px;
 }
 
+
+/* ── MOVING PLAN ── */
+.moving-plan-toggle {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; padding: 12px 0; margin-bottom: 4px;
+}
+.moving-plan-toggle input[type="checkbox"] {
+  width: 15px; height: 15px; flex-shrink: 0; cursor: pointer;
+  accent-color: var(--text-primary);
+}
+.moving-plan-toggle-label {
+  font-size: 12px; color: var(--text-primary); font-weight: 300;
+  letter-spacing: .02em; user-select: none;
+}
+.address-fields-collapsible { transition: opacity .2s; }
+.address-fields-collapsible.hidden { display: none; }
+
 /* ── NOTICE BOX ── */
 .notice-box {
   border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -1079,19 +1096,27 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
           <input class="form-input" type="text" id="recipientName" name="recipient_name" placeholder="例）山田 太郎" required>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="postalCode">
-            郵便番号 <span class="required-mark">*</span>
-          </label>
-          <input class="form-input" type="text" id="postalCode" name="postal_code" placeholder="例）150-0001" maxlength="8" required>
-          <p class="field-hint" id="postalHint">郵便番号を入力すると、住所が自動入力されます。</p>
-        </div>
+        <label class="moving-plan-toggle">
+          <input type="checkbox" id="movingPlan">
+          <span class="moving-plan-toggle-label">引越し予定があり、住所が未定</span>
+        </label>
+        <p class="field-hint" style="margin-bottom:18px;margin-top:-2px;">チェックするとお届け先住所の入力をスキップできます。住所が決まり次第、kuppographyまでご連絡ください。</p>
 
-        <div class="form-group">
-          <label class="form-label" for="address">
-            住所 <span class="required-mark">*</span>
-          </label>
-          <input class="form-input" type="text" id="address" name="address" placeholder="都道府県・市区町村・番地以降" required>
+        <div class="address-fields-collapsible" id="addressFieldsWrap">
+          <div class="form-group">
+            <label class="form-label" for="postalCode">
+              郵便番号 <span class="required-mark">*</span>
+            </label>
+            <input class="form-input" type="text" id="postalCode" name="postal_code" placeholder="例）150-0001" maxlength="8" required>
+            <p class="field-hint" id="postalHint">郵便番号を入力すると、住所が自動入力されます。</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="address">
+              住所 <span class="required-mark">*</span>
+            </label>
+            <input class="form-input" type="text" id="address" name="address" placeholder="都道府県・市区町村・番地以降" required>
+          </div>
         </div>
 
         <div class="form-group">
@@ -1417,8 +1442,6 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
       ['customerEmail', 'summaryEmail'],
       ['customerPhone', 'summaryPhone'],
       ['recipientName', 'summaryRecipient'],
-      ['postalCode',    'summaryPostal'],
-      ['address',       'summaryAddress'],
       ['note',          'summaryNote'],
     ];
     fields.forEach(function (pair) {
@@ -1427,6 +1450,21 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
       if (!el || !sum) return;
       sum.textContent = el.value.trim() || '（未入力）';
     });
+
+    // 住所：引越し予定チェック対応
+    var isMoving = document.getElementById('movingPlan') && document.getElementById('movingPlan').checked;
+    var sPostal  = document.getElementById('summaryPostal');
+    var sAddress = document.getElementById('summaryAddress');
+    if (isMoving) {
+      if (sPostal)  sPostal.textContent  = '引越し予定（後日連絡）';
+      if (sAddress) sAddress.textContent = '引越し予定（後日連絡）';
+    } else {
+      var pcEl = document.getElementById('postalCode');
+      var adEl = document.getElementById('address');
+      if (sPostal)  sPostal.textContent  = pcEl && pcEl.value.trim() ? pcEl.value.trim() : '（未入力）';
+      if (sAddress) sAddress.textContent = adEl && adEl.value.trim() ? adEl.value.trim() : '（未入力）';
+    }
+
   }
 
   ['names','weddingDate','romanGroom','romanBride','customerEmail','customerPhone','recipientName','postalCode','address','note'].forEach(function (id) {
@@ -1435,6 +1473,20 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
     el.addEventListener('input',  updateSummary);
     el.addEventListener('change', updateSummary);
   });
+
+  // ── 引越し予定チェックボックス ─────────────────────────────────────────────
+  var movingPlanChk     = document.getElementById('movingPlan');
+  var addressFieldsWrap = document.getElementById('addressFieldsWrap');
+  function toggleAddressFields() {
+    var moving = movingPlanChk && movingPlanChk.checked;
+    if (addressFieldsWrap) addressFieldsWrap.classList.toggle('hidden', moving);
+    var pc = document.getElementById('postalCode');
+    var ad = document.getElementById('address');
+    if (pc) pc.required = !moving;
+    if (ad) ad.required = !moving;
+    updateSummary();
+  }
+  if (movingPlanChk) movingPlanChk.addEventListener('change', toggleAddressFields);
 
   // ── 郵便番号 → 住所自動入力 ───────────────────────────────────────────────
   var postalInput  = document.getElementById('postalCode');
@@ -1553,8 +1605,8 @@ a:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 4px; }
       'メールアドレス':     document.getElementById('customerEmail').value.trim(),
       '電話番号':           document.getElementById('customerPhone').value.trim(),
       'お届け先氏名':       document.getElementById('recipientName').value.trim(),
-      '郵便番号':           document.getElementById('postalCode').value.trim(),
-      'お届け先住所':       document.getElementById('address').value.trim(),
+      '郵便番号':           (document.getElementById('movingPlan').checked) ? '引越し予定' : document.getElementById('postalCode').value.trim(),
+      'お届け先住所':       (document.getElementById('movingPlan').checked) ? '引越し予定（後日連絡）' : document.getElementById('address').value.trim(),
       '備考':               document.getElementById('note').value.trim(),
       '受付日時':           new Date().toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'}),
       _subject:             '【アルバムお申し込み】' + namesVal + ' 様',
