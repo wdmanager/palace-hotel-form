@@ -651,7 +651,7 @@ a:focus-visible,
       </div>
     </div>
 
-    <p class="album-display-note">アルバムはパレスホテルにございますので、よろしければ実際にお手にとってご確認ください。</p>
+    <p class="album-display-note">アルバムはパレスホテル東京にございますので、よろしければ実際にお手にとってご確認ください。</p>
 
         <!-- ── Application ── -->
     <div class="option-details-heading" id="application" style="margin-top:8px;">
@@ -1656,19 +1656,24 @@ a:focus-visible,
     });
     if (!sheetOk) mailPayload._subject = '【要確認・スプレッドシート未記録】' + payload._subject;
 
+    // メール送信：失敗したら少し待って最大3回まで送り直す
     var mailOk = false;
-    try {
-      var res  = await fetch(ENDPOINT, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body:    JSON.stringify(mailPayload),
-      });
-      var data = null;
-      try { data = await res.json(); } catch (pe) { data = null; }
-      mailOk = !!(data && String(data.success) === 'true');
-      if (!mailOk) console.error('メール送信失敗:', data);
-    } catch (err) {
-      console.error('メール送信エラー:', err);
+    var waits = [0, 1500, 4000];
+    for (var attempt = 0; attempt < waits.length && !mailOk; attempt++) {
+      if (waits[attempt]) await new Promise(function (r) { setTimeout(r, waits[attempt]); });
+      try {
+        var res  = await fetch(ENDPOINT, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body:    JSON.stringify(mailPayload),
+        });
+        var data = null;
+        try { data = await res.json(); } catch (pe) { data = null; }
+        mailOk = !!(data && String(data.success) === 'true');
+        if (!mailOk) console.error('メール送信失敗（' + (attempt + 1) + '回目）:', data);
+      } catch (err) {
+        console.error('メール送信エラー（' + (attempt + 1) + '回目）:', err);
+      }
     }
 
     setLoading(false);
